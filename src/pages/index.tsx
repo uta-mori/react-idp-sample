@@ -1,65 +1,59 @@
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
+import firebase from '../utils/Firebase';
+import { useState,FC } from "react";
 
-export default function Home() {
+const Home: FC = () => {
+  const [message, setMessage] = useState("");
+
+  const callSecureApi = async () => {
+    try {
+      const token = await firebase.auth().currentUser.getIdToken(true);
+      const response = await fetch(
+        `https://sample-82sgqpjx.de.gateway.dev/books`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const responseData = await response.json();
+
+      setMessage(responseData);
+    } catch (error) {
+      setMessage(error.message);
+    }
+  };
   return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+    <div className="container">
+      <h1>External API</h1>
+      <p>これらのボタンを使用して、外部 API を呼び出すことができます。</p>
+      <p>保護された API 呼び出しは、その認可ヘッダーにアクセストークンを持っています。</p>
+      <p>PI サーバは、Firebaseを使用してアクセストークンを検証します。</p>
+      <div
+        className="btn-group mt-5"
+        role="group"
+        aria-label="External API Requests Examples"
+      >
+        <button
+          type="button"
+          className="bg-indigo-700 font-semibold text-white py-2 px-4 rounded"
+          onClick={callSecureApi}
         >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
+          Get Protected Message
+        </button>
+      </div>
+      {message && (
+        <div className="mt-5">
+          <h6 className="muted">Result</h6>
+          <div className="container-fluid">
+            <div className="row">
+              <code className="col-12 text-light bg-dark p-4">{message}</code>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
-  )
-}
+  );
+};
+
+export default Home
