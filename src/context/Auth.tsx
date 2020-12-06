@@ -1,18 +1,15 @@
-import { User } from 'firebase';
 import { FC, createContext, useEffect, useState } from 'react';
 
 import firebase from '../utils/Firebase';
 
 type AuthContextProps = {
-  currentUser: User | null | undefined
+  currentUser: firebase.User | null | undefined
 }
 
 const AuthContext = createContext<AuthContextProps>({ currentUser: undefined });
 
 const AuthProvider: FC = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState<User | null | undefined>(
-    undefined
-  );
+  const [currentUser, setCurrentUser] = useState<firebase.User | null | undefined>(undefined);
 
   useEffect(() => {
     // ログイン状態が変化するとfirebaseのauthメソッドを呼び出す
